@@ -12,8 +12,8 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.0" />
-        <PackageReference Include="MyJetWallet.Sdk.Postgres" Version="2.0.7" />
-        <PackageReference Include="Service.Exchange.Sdk" Version="1.0.1" />
+        <PackageReference Include="MyJetWallet.Sdk.Postgres" Version="2.0.8" />
+        <PackageReference Include="Service.Exchange.Sdk" Version="1.0.2" />
     </ItemGroup>
 
 </Project>
