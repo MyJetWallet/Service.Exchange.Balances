@@ -23,7 +23,7 @@ namespace Service.Exchange.Balances.Modules
                 "Service.Exchange.Balance",
                 TopicQueueType.Permanent)).As<ISubscriber<ExBalanceUpdateInstructionMessage>>().SingleInstance();
 
-            builder.RegisterMyServiceBusPublisher<ExBalanceUpdate>(serviceBusClient,
+            builder.RegisterMyServiceBusPublisher<ExBalanceUpdateMessage>(serviceBusClient,
                 ExBalanceUpdateMessage.ServiceBusTopicName, false);
 
             builder
