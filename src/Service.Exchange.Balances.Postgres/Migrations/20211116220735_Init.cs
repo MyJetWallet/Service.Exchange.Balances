@@ -22,7 +22,8 @@ namespace Service.Exchange.Balances.Postgres.Migrations
                     AssetId = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
                     Balance = table.Column<decimal>(type: "numeric(20)", precision: 20, nullable: false),
                     ReserveBalance = table.Column<decimal>(type: "numeric(20)", precision: 20, nullable: false),
-                    LastUpdate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    LastUpdate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Version = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {

@@ -41,6 +41,7 @@ namespace Service.Exchange.Balances.Postgres
             modelBuilder.Entity<ExBalance>().Property(e => e.Balance).HasPrecision(20);
             modelBuilder.Entity<ExBalance>().Property(e => e.ReserveBalance).HasPrecision(20);
             modelBuilder.Entity<ExBalance>().Property(e => e.LastUpdate);
+            modelBuilder.Entity<ExBalance>().Property(e => e.Version);
 
             modelBuilder.Entity<ExBalance>().HasIndex(e => e.WalletId);
             modelBuilder.Entity<ExBalance>().HasIndex(e => new { e.WalletId, e.AssetId }).IsUnique();

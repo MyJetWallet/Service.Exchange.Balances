@@ -12,7 +12,7 @@ using Service.Exchange.Balances.Postgres;
 namespace Service.Exchange.Balances.Postgres.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20211116000627_Init")]
+    [Migration("20211116220735_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,24 @@ namespace Service.Exchange.Balances.Postgres.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Service.Exchange.Balances.Postgres.Models.ExBalanceSqlEntity", b =>
+            modelBuilder.Entity("Service.Exchange.Balances.Postgres.Models.ProcessedOperationSqlEntity", b =>
+                {
+                    b.Property<string>("OperationId")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<DateTime>("ProcessedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ResponseJson")
+                        .HasColumnType("text");
+
+                    b.HasKey("OperationId");
+
+                    b.ToTable("processed_operations", "exchange_balances");
+                });
+
+            modelBuilder.Entity("Service.Exchange.Sdk.Models.ExBalance", b =>
                 {
                     b.Property<string>("WalletIdAssetId")
                         .HasMaxLength(260)
@@ -46,6 +63,9 @@ namespace Service.Exchange.Balances.Postgres.Migrations
                         .HasPrecision(20)
                         .HasColumnType("numeric(20)");
 
+                    b.Property<long>("Version")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("WalletId")
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)");
@@ -58,23 +78,6 @@ namespace Service.Exchange.Balances.Postgres.Migrations
                         .IsUnique();
 
                     b.ToTable("balances", "exchange_balances");
-                });
-
-            modelBuilder.Entity("Service.Exchange.Balances.Postgres.Models.ProcessedOperationSqlEntity", b =>
-                {
-                    b.Property<string>("OperationId")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
-
-                    b.Property<DateTime>("ProcessedTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("ResponseJson")
-                        .HasColumnType("text");
-
-                    b.HasKey("OperationId");
-
-                    b.ToTable("processed_operations", "exchange_balances");
                 });
 #pragma warning restore 612, 618
         }

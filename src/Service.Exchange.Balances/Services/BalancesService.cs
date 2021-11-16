@@ -61,7 +61,8 @@ namespace Service.Exchange.Balances.Services
                                 AssetId = updateRequest.AssetId,
                                 Balance = 0,
                                 ReserveBalance = 0,
-                                LastUpdate = now
+                                LastUpdate = now,
+                                Version = 0
                             };
 
                         if (updateRequest.Amount < 0 && balance.Balance < -updateRequest.Amount)
@@ -148,6 +149,10 @@ namespace Service.Exchange.Balances.Services
 
                     if (status == ExBalanceUpdate.BalanceUpdateResult.Ok)
                     {
+                        foreach (var balancesValue in balances.Values)
+                        {
+                            balancesValue.Version++;
+                        }
                         await context.UpsertRangeAsync(balances.Values);
                         await context.InsertAsync(new ProcessedOperationSqlEntity
                         {
