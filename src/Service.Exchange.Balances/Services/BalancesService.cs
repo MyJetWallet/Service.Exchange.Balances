@@ -30,7 +30,7 @@ namespace Service.Exchange.Balances.Services
 
         public async Task<ExBalanceUpdate> ProcessBalanceUpdates(ExBalanceUpdateInstruction request)
         {
-            using (_myLocker.GetLocker())
+            using (await _myLocker.GetLocker())
             {
                 try
                 {

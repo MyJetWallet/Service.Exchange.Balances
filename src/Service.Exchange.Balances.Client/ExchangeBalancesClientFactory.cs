@@ -1,27 +1,16 @@
-﻿using System;
-using Grpc.Core;
-using Grpc.Core.Interceptors;
-using Grpc.Net.Client;
-using JetBrains.Annotations;
-using MyJetWallet.Sdk.GrpcMetrics;
-using ProtoBuf.Grpc.Client;
+﻿using JetBrains.Annotations;
+using MyJetWallet.Sdk.Grpc;
 using Service.Exchange.Balances.Grpc;
 
 namespace Service.Exchange.Balances.Client
 {
     [UsedImplicitly]
-    public class ExchangeBalancesClientFactory
+    public class ExchangeBalancesClientFactory : MyGrpcClientFactory
     {
-        private readonly CallInvoker _channel;
-
-        public ExchangeBalancesClientFactory(string grpcServiceUrl)
+        public ExchangeBalancesClientFactory(string grpcServiceUrl) : base(grpcServiceUrl)
         {
-            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
-            var channel = GrpcChannel.ForAddress(grpcServiceUrl);
-            _channel = channel.Intercept(new PrometheusMetricsInterceptor());
         }
 
-        public IBalanceOperationService GetBalanceOperationService() =>
-            _channel.CreateGrpcService<IBalanceOperationService>();
+        public IBalanceOperationService GetBalanceOperationService() => CreateGrpcService<IBalanceOperationService>();
     }
 }

@@ -7,7 +7,6 @@ using Service.Exchange.Balances.Domain;
 using Service.Exchange.Balances.Domain.Models.ServiceBus;
 using Service.Exchange.Balances.Jobs;
 using Service.Exchange.Balances.Services;
-using Service.Exchange.Sdk.Messages;
 
 namespace Service.Exchange.Balances.Modules
 {
