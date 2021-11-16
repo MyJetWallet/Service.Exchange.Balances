@@ -19,10 +19,12 @@ namespace Service.Exchange.Balances.Jobs
         public BalanceUpdateInstructionJob(
             ISubscriber<ExBalanceUpdateInstructionMessage> subscriber,
             ILogger<BalanceUpdateInstructionJob> logger,
-            IBalancesService balancesService)
+            IBalancesService balancesService, 
+            IServiceBusPublisher<ExBalanceUpdateMessage> depositPublisher)
         {
             _logger = logger;
             _balancesService = balancesService;
+            _depositPublisher = depositPublisher;
             subscriber.Subscribe(HandleSignal);
         }
 
