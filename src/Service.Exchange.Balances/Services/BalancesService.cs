@@ -142,6 +142,7 @@ namespace Service.Exchange.Balances.Services
                         Instance = Program.Settings.InstanceName,
                         Timestamp = now,
                         OperationId = request.OperationId,
+                        EventType = request.EventType,
                         Result = status,
                         Updates = updates,
                         Balances = balances.Values.ToList()

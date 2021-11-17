@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Service.Exchange.Sdk" Version="1.0.3" />
+    <PackageReference Include="Service.Exchange.Sdk" Version="1.0.4" />
   </ItemGroup>
 
 </Project>
