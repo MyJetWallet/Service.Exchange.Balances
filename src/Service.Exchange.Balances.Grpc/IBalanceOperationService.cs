@@ -9,6 +9,9 @@ namespace Service.Exchange.Balances.Grpc
     public interface IBalanceOperationService
     {
         [OperationContract]
+        Task<ExBalanceUpdate> ProcessBalanceUpdate(ExBalanceUpdateInstruction request);
+        
+        [OperationContract]
         Task<List<ExBalanceUpdate>> ProcessBalanceUpdates(List<ExBalanceUpdateInstruction> request);
     }
 }

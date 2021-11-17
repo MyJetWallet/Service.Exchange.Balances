@@ -25,6 +25,23 @@ namespace Service.Exchange.Balances.Services
             _depositPublisher = depositPublisher;
         }
 
+        public async Task<ExBalanceUpdate> ProcessBalanceUpdate(ExBalanceUpdateInstruction request)
+        {
+            request.AddToActivityAsJsonTag("request-data");
+            _logger.LogInformation("Receive ProcessBalanceUpdate request: {JsonRequest}",
+                JsonConvert.SerializeObject(request));
+            
+            var responseResult = await _balancesService.ProcessBalanceUpdates(request);
+
+            await _depositPublisher.PublishAsync(new ExBalanceUpdateMessage(responseResult));
+            
+            responseResult.AddToActivityAsJsonTag("response-data");
+            _logger.LogInformation("Processed ProcessBalanceUpdate request: {JsonResult}",
+                JsonConvert.SerializeObject(responseResult));
+
+            return responseResult;
+        }
+
         public async Task<List<ExBalanceUpdate>> ProcessBalanceUpdates(List<ExBalanceUpdateInstruction> request)
         {
             request.AddToActivityAsJsonTag("request-data");
