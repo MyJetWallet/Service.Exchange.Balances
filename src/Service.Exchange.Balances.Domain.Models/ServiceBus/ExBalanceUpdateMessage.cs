@@ -4,9 +4,12 @@ using Service.Exchange.Sdk.Messages;
 namespace Service.Exchange.Balances.Domain.Models.ServiceBus
 {
     [DataContract]
-    public class ExBalanceUpdateMessage : ExBalanceUpdate
+    public class ExBalanceUpdateMessage
     {
         public static readonly string ServiceBusTopicName = "jet-wallet-balance-update";
+        
+        [DataMember(Order = 1)]
+        public ExBalanceUpdate Update { get; set; }
 
         public ExBalanceUpdateMessage()
         {
@@ -14,13 +17,7 @@ namespace Service.Exchange.Balances.Domain.Models.ServiceBus
 
         public ExBalanceUpdateMessage(ExBalanceUpdate update)
         {
-            OperationId = update.OperationId;
-            Instance = update.Instance;
-            Timestamp = update.Timestamp;
-            Result = update.Result;
-            Updates = update.Updates;
-            Balances = update.Balances;
-            EventType = update.EventType;
+            Update = update;
         }
     }
 }

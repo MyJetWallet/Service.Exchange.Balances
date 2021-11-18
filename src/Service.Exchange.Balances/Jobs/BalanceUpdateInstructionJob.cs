@@ -36,7 +36,7 @@ namespace Service.Exchange.Balances.Jobs
                 exBalanceUpdateInstruction.AddToActivityAsJsonTag("request-data");
                 _logger.LogInformation("Receive ExBalanceUpdateInstructionMessage: {JsonRequest}",
                     JsonConvert.SerializeObject(exBalanceUpdateInstruction));
-                var result = await _balancesService.ProcessBalanceUpdates(exBalanceUpdateInstruction);
+                var result = await _balancesService.ProcessBalanceUpdates(exBalanceUpdateInstruction.Instruction);
 
                 result.AddToActivityAsJsonTag("response-data");
                 _logger.LogInformation("Processed ProcessBalanceUpdates request: {JsonResult}",
