@@ -8,6 +8,10 @@ namespace Service.Exchange.Balances.Domain.Models.ServiceBus
     {
         public static readonly string ServiceBusTopicName = "jet-wallet-balance-update";
 
+        public ExBalanceUpdateMessage()
+        {
+        }
+
         public ExBalanceUpdateMessage(ExBalanceUpdate update)
         {
             OperationId = update.OperationId;
