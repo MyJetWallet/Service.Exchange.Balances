@@ -58,7 +58,7 @@ namespace Service.Exchange.Balances.Postgres.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal>("ReserveBalance")
-                        .HasPrecision(40, 40)
+                        .HasPrecision(40, 20)
                         .HasColumnType("numeric(40,20)");
 
                     b.Property<long>("Version")
