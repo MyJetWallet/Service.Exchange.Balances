@@ -1,7 +1,9 @@
-﻿using Service.Exchange.Sdk.Messages;
+﻿using System.Runtime.Serialization;
+using Service.Exchange.Sdk.Messages;
 
 namespace Service.Exchange.Balances.Domain.Models.ServiceBus
 {
+    [DataContract]
     public class ExBalanceUpdateMessage : ExBalanceUpdate
     {
         public static readonly string ServiceBusTopicName = "jet-wallet-balance-update";
