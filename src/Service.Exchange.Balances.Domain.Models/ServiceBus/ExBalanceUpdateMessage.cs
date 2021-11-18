@@ -16,6 +16,7 @@ namespace Service.Exchange.Balances.Domain.Models.ServiceBus
             Result = update.Result;
             Updates = update.Updates;
             Balances = update.Balances;
+            EventType = update.EventType;
         }
     }
 }
