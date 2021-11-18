@@ -51,15 +51,15 @@ namespace Service.Exchange.Balances.Postgres.Migrations
                         .HasColumnType("character varying(128)");
 
                     b.Property<decimal>("Balance")
-                        .HasPrecision(20, 20)
-                        .HasColumnType("numeric(20,20)");
+                        .HasPrecision(40, 20)
+                        .HasColumnType("numeric(40,20)");
 
                     b.Property<DateTime>("LastUpdate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal>("ReserveBalance")
-                        .HasPrecision(20, 20)
-                        .HasColumnType("numeric(20,20)");
+                        .HasPrecision(40, 40)
+                        .HasColumnType("numeric(40,20)");
 
                     b.Property<long>("Version")
                         .HasColumnType("bigint");

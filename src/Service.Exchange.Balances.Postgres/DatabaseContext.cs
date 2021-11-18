@@ -38,8 +38,8 @@ namespace Service.Exchange.Balances.Postgres
             modelBuilder.Entity<ExBalance>().HasKey(e => e.WalletIdAssetId);
             modelBuilder.Entity<ExBalance>().Property(e => e.WalletId).HasMaxLength(128);
             modelBuilder.Entity<ExBalance>().Property(e => e.AssetId).HasMaxLength(128);
-            modelBuilder.Entity<ExBalance>().Property(e => e.Balance).HasPrecision(20, 20);
-            modelBuilder.Entity<ExBalance>().Property(e => e.ReserveBalance).HasPrecision(20, 20);
+            modelBuilder.Entity<ExBalance>().Property(e => e.Balance).HasPrecision(40, 20);
+            modelBuilder.Entity<ExBalance>().Property(e => e.ReserveBalance).HasPrecision(40, 20);
             modelBuilder.Entity<ExBalance>().Property(e => e.LastUpdate);
             modelBuilder.Entity<ExBalance>().Property(e => e.Version);
 

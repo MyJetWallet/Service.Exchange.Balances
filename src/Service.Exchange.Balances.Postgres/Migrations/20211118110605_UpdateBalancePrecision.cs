@@ -12,8 +12,8 @@ namespace Service.Exchange.Balances.Postgres.Migrations
                 name: "ReserveBalance",
                 schema: "exchange_balances",
                 table: "balances",
-                type: "numeric(20,20)",
-                precision: 20,
+                type: "numeric(40,20)",
+                precision: 40,
                 scale: 20,
                 nullable: false,
                 oldClrType: typeof(decimal),
@@ -24,8 +24,8 @@ namespace Service.Exchange.Balances.Postgres.Migrations
                 name: "Balance",
                 schema: "exchange_balances",
                 table: "balances",
-                type: "numeric(20,20)",
-                precision: 20,
+                type: "numeric(40,20)",
+                precision: 40,
                 scale: 20,
                 nullable: false,
                 oldClrType: typeof(decimal),
@@ -43,8 +43,8 @@ namespace Service.Exchange.Balances.Postgres.Migrations
                 precision: 20,
                 nullable: false,
                 oldClrType: typeof(decimal),
-                oldType: "numeric(20,20)",
-                oldPrecision: 20,
+                oldType: "numeric(40,20)",
+                oldPrecision: 40,
                 oldScale: 20);
 
             migrationBuilder.AlterColumn<decimal>(
@@ -55,8 +55,8 @@ namespace Service.Exchange.Balances.Postgres.Migrations
                 precision: 20,
                 nullable: false,
                 oldClrType: typeof(decimal),
-                oldType: "numeric(20,20)",
-                oldPrecision: 20,
+                oldType: "numeric(40,20)",
+                oldPrecision: 40,
                 oldScale: 20);
         }
     }
