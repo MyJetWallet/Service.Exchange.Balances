@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Sdk.Service;
@@ -54,9 +55,9 @@ namespace Service.Exchange.Balances.Services
             {
                 var responseResult = await _balancesService.ProcessBalanceUpdates(exBalanceUpdateInstruction);
                 result.Add(responseResult);
-
-                await _depositPublisher.PublishAsync(new ExBalanceUpdateMessage(responseResult));
             }
+            
+            await _depositPublisher.PublishAsync(result.Select(e => new ExBalanceUpdateMessage(e)));
 
             result.AddToActivityAsJsonTag("response-data");
             _logger.LogInformation("Processed ProcessBalanceUpdates request: {JsonResult}",

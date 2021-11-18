@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using MyJetWallet.Sdk.Service;
 using MyJetWallet.Sdk.Service.Tools;
 using Newtonsoft.Json;
 using Service.Exchange.Balances.Domain;
@@ -11,6 +12,7 @@ using Service.Exchange.Balances.Postgres;
 using Service.Exchange.Balances.Postgres.Models;
 using Service.Exchange.Sdk.Messages;
 using Service.Exchange.Sdk.Models;
+// ReSharper disable InconsistentLogPropertyNaming
 
 namespace Service.Exchange.Balances.Services
 {
@@ -47,25 +49,34 @@ namespace Service.Exchange.Balances.Services
                     var status = ExBalanceUpdate.BalanceUpdateResult.Ok;
                     var updates = new List<ExBalanceUpdate.Update>();
                     var balances = new Dictionary<string, ExBalance>();
-                    var now = DateTime.Now;
+                    var now = DateTime.UtcNow;
                     foreach (var updateRequest in request.Updates)
                     {
-                        var balance =
-                            balances.GetValueOrDefault($"{updateRequest.WalletId}::{updateRequest.AssetId}") ??
-                            await context.Balances
+                        var balance = balances.GetValueOrDefault($"{updateRequest.WalletId}::{updateRequest.AssetId}");
+                        if (balance == null)
+                        {
+                            balance = await context.Balances
                                 .Where(e => e.WalletId == updateRequest.WalletId && e.AssetId == updateRequest.AssetId)
-                                .SingleOrDefaultAsync() ??
-                            new ExBalance
-                            {
-                                WalletId = updateRequest.WalletId,
-                                AssetId = updateRequest.AssetId,
-                                Balance = 0,
-                                ReserveBalance = 0,
-                                LastUpdate = now,
-                                Version = 0
-                            };
+                                .SingleOrDefaultAsync();
 
-                        if (updateRequest.Amount < 0 && balance.Balance < -updateRequest.Amount)
+                            if (balance == null)
+                            {
+                                balance = new ExBalance
+                                {
+                                    WalletId = updateRequest.WalletId,
+                                    AssetId = updateRequest.AssetId,
+                                    Balance = 0,
+                                    ReserveBalance = 0,
+                                    LastUpdate = now,
+                                    Version = 0
+                                };
+                                context.Balances.Add(balance);
+                            }
+
+                            balances.TryAdd($"{updateRequest.WalletId}::{updateRequest.AssetId}", balance);
+                        }
+
+                        if (balance.Balance + updateRequest.Amount < 0)
                         {
                             // withdrawal/sell
                             updates.Add(new ExBalanceUpdate.Update
@@ -82,7 +93,7 @@ namespace Service.Exchange.Balances.Services
                             continue;
                         }
 
-                        if (updateRequest.ReserveAmount > 0 && balance.Balance < updateRequest.ReserveAmount)
+                        if (balance.Balance - updateRequest.ReserveAmount < 0)
                         {
                             // reserve funds
                             updates.Add(new ExBalanceUpdate.Update
@@ -99,7 +110,7 @@ namespace Service.Exchange.Balances.Services
                             continue;
                         }
 
-                        if (updateRequest.ReserveAmount < 0 && balance.ReserveBalance < -updateRequest.ReserveAmount)
+                        if (balance.ReserveBalance + updateRequest.ReserveAmount < 0)
                         {
                             // unreserve funds
                             updates.Add(new ExBalanceUpdate.Update
@@ -112,7 +123,7 @@ namespace Service.Exchange.Balances.Services
                                 Result = ExBalanceUpdate.BalanceUpdateResult.LowBalance,
                                 ErrorMessage = "Unable to unreserve funds, low balance"
                             });
-                            status = ExBalanceUpdate.BalanceUpdateResult.LowBalance;
+                            status = ExBalanceUpdate.BalanceUpdateResult.LowReserveBalance;
                             continue;
                         }
 
@@ -133,8 +144,6 @@ namespace Service.Exchange.Balances.Services
                             ReserveNewBalance = balance.ReserveBalance,
                             Result = ExBalanceUpdate.BalanceUpdateResult.Ok,
                         });
-
-                        balances.TryAdd($"{updateRequest.WalletId}::{updateRequest.AssetId}", balance);
                     }
 
                     var result = new ExBalanceUpdate
@@ -154,8 +163,8 @@ namespace Service.Exchange.Balances.Services
                         {
                             balancesValue.Version++;
                         }
-                        await context.UpsertRangeAsync(balances.Values);
-                        await context.InsertAsync(new ProcessedOperationSqlEntity
+
+                        context.ProcessedOperations.Add(new ProcessedOperationSqlEntity
                         {
                             OperationId = request.OperationId,
                             ProcessedTime = now,
@@ -168,7 +177,9 @@ namespace Service.Exchange.Balances.Services
                 }
                 catch (Exception exception)
                 {
-                    _logger.LogError(exception, "Cannot Process Balance Updates");
+                    _logger.LogError(exception, "Cannot Process Balance Updates: {requestJson}",
+                        JsonConvert.SerializeObject(request));
+                    exception.FailActivity();
                     return new ExBalanceUpdate
                     {
                         Instance = Program.Settings.InstanceName,
