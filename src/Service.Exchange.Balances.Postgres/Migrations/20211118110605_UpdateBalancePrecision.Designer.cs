@@ -12,7 +12,7 @@ using Service.Exchange.Balances.Postgres;
 namespace Service.Exchange.Balances.Postgres.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20211118105153_UpdateBalancePrecision")]
+    [Migration("20211118110605_UpdateBalancePrecision")]
     partial class UpdateBalancePrecision
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
