@@ -126,10 +126,45 @@ namespace Service.Exchange.Balances.Services
                             status = ExBalanceUpdate.BalanceUpdateResult.LowReserveBalance;
                             continue;
                         }
+                        
+                        if (!CanReserve(balance, updateRequest.ReserveFuturesOrders, out status))
+                        {
+                            updates.Add(CreateFailedUpdate(updateRequest, status,
+                                "Unable to reserve funds for FuturesOrders"));
+                            continue;
+                        }
+                        
+                        if (!CanReserve(balance, updateRequest.ReserveFuturesPositions, out status))
+                        {
+                            updates.Add(CreateFailedUpdate(updateRequest, status,
+                                "Unable to reserve funds for FuturesPositions"));
+                            continue;
+                        }
+                        
+                        if (!CanUnReserve(balance.ReserveFuturesPositions, updateRequest.ReserveFuturesPositions, out status))
+                        {
+                            updates.Add(CreateFailedUpdate(updateRequest, status,
+                                "Unable to unreserve FuturesPositions funds"));
+                            continue;
+                        }
+                        
+                        if (!CanUnReserve(balance.ReserveFuturesOrders, updateRequest.ReserveFuturesOrders, out status))
+                        {
+                            updates.Add(CreateFailedUpdate(updateRequest, status,
+                                "Unable to unreserve FuturesOrders funds"));
+                            continue;
+                        }
 
                         var (oldBalance, oldReserveBalance) = (balance.Balance, balance.ReserveBalance);
-                        balance.Balance += updateRequest.Amount - updateRequest.ReserveAmount;
+                        var oldFuturesPositions = balance.ReserveFuturesPositions;
+                        var oldFuturesOrders = balance.ReserveFuturesOrders;
+
+                        balance.Balance += updateRequest.Amount - updateRequest.ReserveAmount
+                                                                - updateRequest.ReserveFuturesOrders 
+                                                                - updateRequest.ReserveFuturesPositions;
                         balance.ReserveBalance += updateRequest.ReserveAmount;
+                        balance.ReserveFuturesOrders += updateRequest.ReserveFuturesOrders;
+                        balance.ReserveFuturesPositions += updateRequest.ReserveFuturesPositions;
                         balance.LastUpdate = now;
                         updates.Add(new ExBalanceUpdate.Update
                         {
@@ -143,6 +178,12 @@ namespace Service.Exchange.Balances.Services
                             ReserveOldBalance = oldReserveBalance,
                             ReserveNewBalance = balance.ReserveBalance,
                             Result = ExBalanceUpdate.BalanceUpdateResult.Ok,
+                            ReserveOldFuturesOrders = oldFuturesOrders,
+                            ReserveOldFuturesPositions = oldFuturesPositions,
+                            ReserveNewFuturesOrders = balance.ReserveFuturesOrders,
+                            ReserveNewFuturesPositions = balance.ReserveFuturesPositions,
+                            ReserveFuturesOrders = updateRequest.ReserveFuturesOrders,
+                            ReserveFuturesPositions = updateRequest.ReserveFuturesPositions
                         });
                     }
 
@@ -191,6 +232,50 @@ namespace Service.Exchange.Balances.Services
                     };
                 }
             }
+        }
+
+        private bool CanReserve(ExBalance balance, decimal amount, out ExBalanceUpdate.BalanceUpdateResult result)
+        {
+            if (balance.Balance - amount < 0)
+            {
+                result = ExBalanceUpdate.BalanceUpdateResult.LowBalance;
+                return false;
+            }
+            
+            result = ExBalanceUpdate.BalanceUpdateResult.Ok;
+
+            return true;
+        }
+        
+        private bool CanUnReserve(decimal reserveBalance, decimal amount, out ExBalanceUpdate.BalanceUpdateResult result)
+        {
+            if (reserveBalance + amount < 0)
+            {
+                result = ExBalanceUpdate.BalanceUpdateResult.LowBalance;
+
+                return false;
+            }
+            
+            result = ExBalanceUpdate.BalanceUpdateResult.Ok;
+
+            return true;
+        }
+
+        private ExBalanceUpdate.Update CreateFailedUpdate(ExBalanceUpdateInstruction.BalanceUpdate updateRequest,
+            ExBalanceUpdate.BalanceUpdateResult status, string errorMessage = null)
+        {
+            return new ExBalanceUpdate.Update
+            {
+                Number = updateRequest.Number,
+                WalletId = updateRequest.WalletId,
+                AssetId = updateRequest.AssetId,
+                Amount = updateRequest.Amount,
+                ReserveAmount = updateRequest.ReserveAmount,
+                Result = status,
+                ErrorMessage = errorMessage != null ? $"{errorMessage}, {status.ToString()}" : null,
+                ReserveFuturesOrders = updateRequest.ReserveFuturesOrders,
+                ReserveFuturesPositions = updateRequest.ReserveFuturesPositions
+            };
         }
     }
 }
