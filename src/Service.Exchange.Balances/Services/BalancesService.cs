@@ -126,32 +126,36 @@ namespace Service.Exchange.Balances.Services
                             status = ExBalanceUpdate.BalanceUpdateResult.LowReserveBalance;
                             continue;
                         }
-                        
-                        if (!CanReserve(balance, updateRequest.ReserveFuturesOrders, out status))
+
+                        if (!CanReserve(balance, updateRequest.ReserveFuturesOrders, out var reserveStatus))
                         {
                             updates.Add(CreateFailedUpdate(updateRequest, status,
                                 "Unable to reserve funds for FuturesOrders"));
+                            status = reserveStatus;
                             continue;
                         }
                         
-                        if (!CanReserve(balance, updateRequest.ReserveFuturesPositions, out status))
+                        if (!CanReserve(balance, updateRequest.ReserveFuturesPositions, out reserveStatus))
                         {
                             updates.Add(CreateFailedUpdate(updateRequest, status,
                                 "Unable to reserve funds for FuturesPositions"));
+                            status = reserveStatus;
                             continue;
                         }
                         
-                        if (!CanUnReserve(balance.ReserveFuturesPositions, updateRequest.ReserveFuturesPositions, out status))
+                        if (!CanUnReserve(balance.ReserveFuturesPositions, updateRequest.ReserveFuturesPositions, out reserveStatus))
                         {
                             updates.Add(CreateFailedUpdate(updateRequest, status,
                                 "Unable to unreserve FuturesPositions funds"));
+                            status = reserveStatus;
                             continue;
                         }
                         
-                        if (!CanUnReserve(balance.ReserveFuturesOrders, updateRequest.ReserveFuturesOrders, out status))
+                        if (!CanUnReserve(balance.ReserveFuturesOrders, updateRequest.ReserveFuturesOrders, out reserveStatus))
                         {
                             updates.Add(CreateFailedUpdate(updateRequest, status,
                                 "Unable to unreserve FuturesOrders funds"));
+                            status = reserveStatus;
                             continue;
                         }
 
